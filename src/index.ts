@@ -60,10 +60,14 @@ wss.on('connection', (clientWs: WebSocket, req: IncomingMessage) => {
   const symbol = pathParts[2] || 'EURUSD';
   const timeframe = url.searchParams.get('timeframe') || '1';
 
-  console.log(`[Proxy] New connection: ${symbol} TF:${timeframe} (active: ${stats.activeConnections})`);
+  // VPS symbols have a suffix (e.g., EURUSD-)
+  // Add suffix if not already present
+  const vpsSymbol = symbol.endsWith('-') ? symbol : `${symbol}-`;
 
-  // Connect to VPS WebSocket
-  const vpsUrl = `${VPS_WS_URL}/ws/tick/${symbol}?timeframe=${timeframe}`;
+  console.log(`[Proxy] New connection: ${symbol} -> ${vpsSymbol} TF:${timeframe} (active: ${stats.activeConnections})`);
+
+  // Connect to VPS WebSocket with suffixed symbol
+  const vpsUrl = `${VPS_WS_URL}/ws/tick/${vpsSymbol}?timeframe=${timeframe}`;
   let vpsWs: WebSocket | null = null;
   let isClosing = false;
 
